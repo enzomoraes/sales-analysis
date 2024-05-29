@@ -1,0 +1,34 @@
+Número do ADR: 001
+Título: Extração de dados
+Data: 15/05/2024
+Status: Pendente
+
+Contexto
+Extrair dados de uma base para conseguir aplicar algoritmos de regressão.
+Os dados dessa base estão num formato não convencional e bem antigo no formato .tps
+A extração de dados deve ser feita para um formato mais comum
+
+Decisão
+Foi decidido transformar os arquivos .tps em arquivos .csv pois são um formato comum e considerados leves e simples o suficiente e que atenderá os casos de uso de regressão
+Utilizar a biblioteca tps-to-csv.jar para transformar os arquivos .tps em csv.
+
+Justificativa
+Os arquivos .tps são difíceis de lidar e há poucas ferramentas disponíveis para lidar com dados nesse formato.
+Em uma pesquisa na internet, é possível encontrar ferramentas online que fazem essa transformação de .tps -> .csv, porém há um limite de tamanho.
+O tamanho do arquivo é considerável, pois engloba alguns anos de dados de vendas.
+Portanto foi necessário encontrar alguma ferramenta capaz de fazer essa transformação, e foi encontrada a tps-to-csv.jar.
+O formato .csv é bem comum e considerado fácil de lidar no mundo de Inteligência artificial
+
+Consequências
+Essa ferramenta é usada em linha de comando.
+Portanto, para transformar os arquivos .tps, será necessário um ambiente com java 8+ instalado para realizar a tranformação.
+Existe o código fonte no github caso queira ser usado como lib, porém isso definiria a linguagem do projeto inteiro sendo Java, e é uma decisão que não quero tomar agora
+
+
+Alternativas Consideradas
+Ferramentas de conversão online
+
+Referências
+
+https://github.com/ctrl-alt-dev/tps-parse
+https://stackoverflow.com/questions/21152886/convert-from-tps-to-csv
