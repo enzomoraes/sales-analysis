@@ -18,8 +18,8 @@ java: Invokes the Java runtime environment.
 For detailed documentation and usage instructions, refer to the tps-parse repository: https://github.com/topics/tps.  
 
 #### Additional Resources:  
-[tps-to-csv.jar utility](https://github.com/topics/tps)  
-[tps-parse repository](https://github.com/topics/tps)
+[tps-to-csv.jar utility](https://www.ctrl-alt-dev.nl/Projects/TPS-to-CSV/TPS-to-CSV.html)  
+[tps-parse repository](https://github.com/ctrl-alt-dev/tps-parse)
 
 ## Folders
 ADR Folder:
