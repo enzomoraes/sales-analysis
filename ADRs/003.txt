@@ -7,10 +7,10 @@ Contexto
 Escolha de linguagem para criação do script para inserção dos dados no banco de dados.
 
 Decisão
-Foi decidido usar Node.js para leitura do arquivo .csv, usando generator functions para que o processo não use muita memória e use a assincronicidade do Loop de eventos da melhor maneira, para processar os dados por demanda.
+Foi decidido usar Node.js para leitura do arquivo .csv, usando generator functions para inserir os dados sob demanda.
 
 Justificativa
-O loop de eventos quando usado com as generatos functions assíncronas do Node.js possibilita uma leitura rápida e efetiva do arquivo pois processo os dados sob demanda.
+As generatos functions assíncronas do Node.js possibilitam inserir os dados sob demanda, liberando recursos do processo
 
 Consequências
 Será necessário futuras refatorações no código para inserir dados novos ou em outras tabelas.

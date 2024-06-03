@@ -2,7 +2,7 @@ const { Pool } = require('pg');
 const fs = require('node:fs');
 const path = require('path');
 
-const insertQuery = `INSERT INTO vendas (
+const insertQuery = `INSERT INTO item_venda (
   "Rec No",
   "Iditensvnd",
   "Lkvenda",
@@ -38,7 +38,7 @@ const insertQuery = `INSERT INTO vendas (
   "Turno"
 )
 VALUES (
-  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33
 );
 `;
 
@@ -49,7 +49,7 @@ async function processCSV(filePath, connectionString) {
     await client.connect();
 
     for await (const record of lerCSV(filePath)) {
-      await client.query(insertQuery, record);
+      const a = await client.query(insertQuery, record);
     }
   } catch (error) {
     console.error('Error processing CSV:', error);
@@ -60,8 +60,12 @@ async function processCSV(filePath, connectionString) {
 
 function* lerCSV(caminhoDoArquivo) {
   const data = fs.readFileSync(caminhoDoArquivo, { encoding: 'utf-8' });
-  for (const line of data.split('\n').splice(0, 1)) {
-    yield line.split(',');
+  // desconsiderando header
+  for (const line of data.split('\n').splice(1)) {
+    yield line.split(',').map(v => {
+      if (!v) return null;
+      return v.replace('"', '').replace('"', '');
+    });
   }
 }
 
