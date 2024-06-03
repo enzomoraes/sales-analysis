@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  sales-analysis-db:
+    container_name: sales-analysis-db
+    image: postgres
+    ports:
+      - '5432:5432'
+    restart: always
+    volumes:
+      - sales-analysis:/var/lib/postgresql/data
+      - ./load/migrations/:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+volumes:
+  sales-analysis: {}

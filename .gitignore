@@ -1,2 +1,3 @@
 *.csv
 *.TPS
+**/node_modules

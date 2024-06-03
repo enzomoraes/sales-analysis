@@ -1,0 +1,25 @@
+Número do ADR: 003
+Título: Criação de Script para inserção dos dados no banco de dados
+Data: 02/06/2024
+Status: Pendente
+
+Contexto
+Escolha de linguagem para criação do script para inserção dos dados no banco de dados.
+
+Decisão
+Foi decidido usar Node.js para leitura do arquivo .csv, usando generator functions para que o processo não use muita memória e use a assincronicidade do Loop de eventos da melhor maneira, para processar os dados por demanda.
+
+Justificativa
+O loop de eventos quando usado com as generatos functions assíncronas do Node.js possibilita uma leitura rápida e efetiva do arquivo pois processo os dados sob demanda.
+
+Consequências
+Será necessário futuras refatorações no código para inserir dados novos ou em outras tabelas.
+
+
+Alternativas Consideradas
+Usar Java para leitura do csv e inserção - seria muito verboso para uma tarefa simples.
+
+Referências
+
+ADR 002
+

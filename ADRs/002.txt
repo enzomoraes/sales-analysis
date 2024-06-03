@@ -1,0 +1,26 @@
+Número do ADR: 002
+Título: Inserção dos dados em um banco de dados relacional
+Data: 02/06/2024
+Status: Pendente
+
+Contexto
+Inserir os dados extraídos em um banco de dados relacional, para possibilitar agregação dos dados usando SQL.
+
+Decisão
+Foi decidido usar o banco PostgreSQL para usar o poder de um banco de dados relacional para realizar agregações e análise de dados mais facilmente.
+
+Justificativa
+Usar o banco de dados relacional possibilita realizar operações pontuais sem precisar manter em memória todos os dados, ao ler o arquivo .csv.
+
+Consequências
+Criação de um arquivo docker compose com volume nomeado para guardar os dados
+Criação de script para leitura do csv e inserção no banco de dados
+Criação de arquivo SQL para criar a tabela do banco
+
+
+Alternativas Consideradas
+Usar ORM - sem necessidade, uma vez que as operações serão apenas de inserções
+Realizar as operações no CSV - ler o arquivo e fazer operações de relacionamento entre futuros dados seria muito dificil usando .csv além de manter tudo em memória
+
+Referências
+
