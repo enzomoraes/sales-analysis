@@ -39,12 +39,13 @@ then follow the ETL folders commands
     -t itensvndfull.csv: Defines the output CSV file named itensvndfull.csv.  
     For detailed documentation and usage instructions, refer to the tps-parse repository: https://github.com/topics/tps.  
 
-- ### Load folder:  
-    contains the tools necessary to load the content extracted into a database.  
-    to populate the database with data from the csv, you must run:  
+    #### To populate the database with data from the csv, you must run:  
     ```
     node load-itensvnd.js
     node load-vendas.js
     node load-produtos.js
     ```
     It may take several minutes to complete
+
+- ### Load folder:  
+    contains the tools necessary to load the content extracted into a database.  
