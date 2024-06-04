@@ -21,11 +21,13 @@ then follow the ETL folders commands
     contains the tools necessary to extract the content.  
     
     #### Extracting and Converting TPS Files to CSV  
-    Extract the .rar file: Unzip the compressed file using a suitable archive extraction tool.  
+    Extract the .zip file: Unzip the compressed file using a suitable archive extraction tool.  
 
     Convert the .TPS file to CSV: Utilize the tps-to-csv.jar utility to transform the extracted TPS file into a CSV format.  
     ```bash
-        java -Xmx6g -jar tps-to-csv.jar -s itensvnd.TPS -t itensvndfull.csv
+        java -Xmx6g -jar tps-to-csv.jar -s itensvnd.TPS -t itensvnd.csv
+        java -Xmx6g -jar tps-to-csv.jar -s produtos.TPS -t produtos.csv
+        java -Xmx6g -jar tps-to-csv.jar -s vendas.TPS -t vendas.csv
     ```
         
     > [!NOTE]  
@@ -39,3 +41,10 @@ then follow the ETL folders commands
 
 - ### Load folder:  
     contains the tools necessary to load the content extracted into a database.  
+    to populate the database with data from the csv, you must run:  
+    ```
+    node load-itensvnd.js
+    node load-vendas.js
+    node load-produtos.js
+    ```
+    It may take several minutes to complete
