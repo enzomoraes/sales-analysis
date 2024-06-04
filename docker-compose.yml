@@ -9,7 +9,7 @@ services:
     restart: always
     volumes:
       - sales-analysis:/var/lib/postgresql/data
-      - ./load/migrations/:/docker-entrypoint-initdb.d
+      - ./extract/scripts/migrations/:/docker-entrypoint-initdb.d
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
