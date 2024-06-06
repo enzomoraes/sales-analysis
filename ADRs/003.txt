@@ -10,7 +10,7 @@ Decisão
 Foi decidido usar Node.js para leitura do arquivo .csv, usando generator functions para inserir os dados sob demanda.
 
 Justificativa
-As generatos functions assíncronas do Node.js possibilitam inserir os dados sob demanda, liberando recursos do processo
+As generators functions assíncronas do Node.js possibilitam inserir os dados sob demanda, liberando recursos do processo
 
 Consequências
 Será necessário futuras refatorações no código para inserir dados novos ou em outras tabelas.

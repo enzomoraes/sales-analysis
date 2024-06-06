@@ -79,18 +79,21 @@ std_y = np.std(y)
 X_normalized = (X - mean_X) / std_X
 y_normalized = (y - mean_y) / std_y
 
-# Construir o modelo de regressão linear
+# Construir o modelo de regressão
 model = tf.keras.Sequential([
     tf.keras.layers.Input(shape=(1,)),
+    tf.keras.layers.Lambda(lambda x: tf.concat([x, x**2, x**3], axis=1)),
     tf.keras.layers.Dense(units=5, activation='sigmoid'),
     tf.keras.layers.Dense(units=1)
 ])
+
+# Adicionar transformação polinomial
 
 # Compilar o modelo com uma taxa de aprendizado menor
 model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='mean_squared_error')
 
 # Treinar o modelo
-model.fit(X_normalized, y_normalized, epochs=1000)
+model.fit(X_normalized, y_normalized, epochs=500)
 
 # Definir os meses do próximo ano para previsão
 ultimo_ano_mes = df_grouped['ano_mes'].max()

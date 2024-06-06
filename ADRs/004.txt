@@ -1,0 +1,35 @@
+Número do ADR: 003
+Título: Criação de Script realizar regressão dos dados de venda
+Data: 02/06/2024
+Status: Pendente
+
+Contexto
+Escolha de linguagem e biblioteca para regressão
+
+Decisão
+Foi decidido usar Python com o framework Tensorflow junto com Mathplotlib para visualização dos dados.
+Numpy e Pandas para tratamento dos dados antes de passá-los para o modelo
+A biblioteca para consultas ao banco de dados foi a psycopg2
+
+Justificativa
+A linguagem python é muito utilizada hoje no contexto de analise de dados e principalmente Inteligência Artificial.
+O framework Tensorflow permite utilizar o motor do Keras, que possibilita criar regressões/modelos para predição de dados de maneira muito fácil.
+Outro fator importante do Tensorflow é a possibilidade de trocar entre Redes Neurais e Regressões alterando poucas linhas.
+A escolha de Numpy e pandas foi feita pensando em bibliotecas que possibilitam tanto leitura de csv quando consultas ao banco de dados.
+Para a consulta ao banco, foi escolhido o psycopg2
+
+Consequências
+Ao usar o psycopg2, estamos escolhendo uma dependencia que permite apenas conexão com banco de dados postgres. No momento não será um problema, pois toda infraestrutura está baseada no banco Postgres.
+Numpy e Pandas são gold Standard de análise de dados, então não haveria muitas opções com ganhos além do que elas podem oferecer.
+Ao usar o Mathplotlib, estamos nos limitando a visualizar os dados apenas localmente, pois os resultados não sao salvos externamente para consulta, o que limita a visualização dos dados em sistemas como Grafana ou parecidos.
+No momento não será um impecilho, pois facilita o desenvolvimento e exportação dos gráficos gerados, que é o necessário para agora.
+
+
+Alternativas Consideradas
+Usar SKLearn - não foi escolhido por falta de experiência dos desenvolvedores com a biblioteca
+Usar Pytorch - não foi escolhido por falta de experiência dos desenvolvedores com a biblioteca
+
+Referências
+
+ADR 002
+
