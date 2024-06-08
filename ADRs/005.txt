@@ -1,0 +1,28 @@
+Número do ADR: 005
+Título: Criação de Script realizar regressão dos dados de venda
+Data: 08/06/2024
+Status: Pendente
+
+Contexto
+Exportar dados da consulta do banco de dados para permitir executar em ambientes mais restritos
+
+Decisão
+Foi decidido exportar os dados necessários para o estudo de vendas da páscoa, para facilitar a execução de algoritmos sem ter a necessidade de uma infraestrutura rodando.
+A configuração inicial de extração de dados será necessária ainda caso seja necessário extrair dados primários da fonte.
+Os dados que serão extraídos, serão já agregados prontos para execução de algoritmos.
+A extração de dados do SGBD para um arquivo csv será feita usando qualquer software de consultas ao SGBD. (PGadmin, DBeaver)
+
+Justificativa
+Ao exportar os dados da consulta para um formato csv, será possível treinar modelos diferentes, sem necessidade de conectar com um SGBD, diminuindo dependencias externas.
+
+Consequências
+Haverá dois tipos de scripts parecidos, e provavelmente o script que antes se conectava ao banco de dados obsoleto com o tempo.
+A decisão de excluí-lo será feita após um período de amadurecimento dessa nova maneira de carregar os dados para o modelo.
+
+
+Alternativas Consideradas
+Permanecer conectando ao banco para realizar as consultas.
+
+Referências
+Discussões com pares abrindo possibilidade de usar Google Colab e Jupyter Notebook.
+
