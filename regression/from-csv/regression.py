@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import sys
 
-
+# region LOADING DATA
 df = pd.read_csv('sales-data.csv')
 
 # Converter a coluna de data para o tipo datetime
@@ -27,6 +27,13 @@ df_grouped['indice'] = df_grouped.index + 1  # Criar um índice sequencial come�
 # Criar um dicionário para mapear índice para ano-mês
 index_to_date = {row['indice']: f"{str(row['ano_mes'])[4:6]}-{str(row['ano_mes'])[:4]}" for _, row in df_grouped.iterrows()}
 
+# Separar as variáveis independentes (X) e dependentes (y)
+X = df_grouped['indice'].values.reshape(-1, 1)
+y = df_grouped['quantidade'].values.reshape(-1, 1)
+
+# endregion
+# region VALIDATING DATA
+
 # Verificar se há valores NaN ou infinitos
 if df_grouped.isna().sum()[1].sum() > 0:  # Verificar valores NaN
   print('there are NaN values')
@@ -34,10 +41,10 @@ if df_grouped.isna().sum()[1].sum() > 0:  # Verificar valores NaN
 if np.isinf(df_grouped).sum()[1].sum() > 0:  # Verificar valores infinitos
   print('there are values with infinite data')
   sys.exit('1')
+  
 
-# Separar as variáveis independentes (X) e dependentes (y)
-X = df_grouped['indice'].values.reshape(-1, 1)
-y = df_grouped['quantidade'].values.reshape(-1, 1)
+# endregion
+# region NORMALIZING DATA
 
 # Calcular a média e o desvio padrão para normalizar e desnormalizar
 mean_X = np.mean(X)
@@ -48,7 +55,9 @@ std_y = np.std(y)
 # Normalizar os dados
 X_normalized = (X - mean_X) / std_X
 y_normalized = (y - mean_y) / std_y
+# endregion
 
+# region MODEL TRAINING
 # Construir o modelo de regressão
 model = tf.keras.Sequential([
     tf.keras.layers.Input(shape=(1,)),
@@ -95,7 +104,9 @@ all_dates = [index_to_date.get(i, f"{str(ano_mes)[-2:]}-{str(ano_mes)[:4]}") for
 for mes, venda, index in zip(indices_para_predicao, previsoes, proximos_meses_ano_mes):
     print(f"Previsão de vendas para o mês {str(index)[-2:]}-{str(index)[:4]}: {venda[0]:.2f}")
 
+#endregion
 
+#region VISUALIZING DATA
 # Plotar os dados e as previsões
 plt.scatter(X, y, color='blue', label='Dados Reais')
 plt.plot(indices_para_predicao, previsoes, color='red', label='Previsões')
