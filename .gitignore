@@ -1,3 +1,4 @@
 *.csv
 *.TPS
 **/node_modules
+!sales-data.csv
