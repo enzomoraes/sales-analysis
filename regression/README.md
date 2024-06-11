@@ -6,6 +6,7 @@ pip install pandas
 pip install tensorflow
 pip install numpy
 pip install psycopg2-binary
+pip install scikit-learn
 ```
 
 then  

@@ -3,6 +3,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import pandas as pd
 import sys
+from sklearn.model_selection import KFold
 
 # region LOADING DATA
 df = pd.read_csv('sales-data.csv')
@@ -59,18 +60,43 @@ y_normalized = (y - mean_y) / std_y
 
 # region MODEL TRAINING
 # Construir o modelo de regressão
+kfold = KFold(n_splits=10, shuffle=True)
+losses = []
+
 model = tf.keras.Sequential([
-    tf.keras.layers.Input(shape=(1,)),
-    tf.keras.layers.Lambda(lambda x: tf.concat([x, x**2, x**3], axis=1)),
-    tf.keras.layers.Dense(units=5, activation='sigmoid'),
-    tf.keras.layers.Dense(units=1)
+  tf.keras.layers.Input(shape=(1,)),
+  tf.keras.layers.Lambda(lambda x: tf.concat([x, x**2, x**3], axis=1)),
+  tf.keras.layers.Dense(units=5, activation='sigmoid'),
+  tf.keras.layers.Dense(units=1)
 ])
 
-# Compilar o modelo com uma taxa de aprendizado menor
-model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='mean_squared_error')
+for train_index, test_index in kfold.split(X_normalized):
+  # Dividir os dados em conjuntos de treinamento e teste
+    X_train, X_test = X_normalized[train_index], X_normalized[test_index]
+    y_train, y_test = y_normalized[train_index], y_normalized[test_index]
 
-# Treinar o modelo
-model.fit(X_normalized, y_normalized, epochs=500)
+    # reseting model weights
+    tf.keras.backend.clear_session()
+
+    # Compilar o modelo com uma taxa de aprendizado menor
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='mean_squared_error')
+    
+    # Treinar o modelo
+    model.fit(X_train, y_train, epochs=500, verbose=0)
+
+    # Avaliar o modelo no conjunto de teste e armazenar a perda
+    loss = model.evaluate(X_test, y_test)
+    losses.append(loss)
+
+# Calcular a média das perdas e desvio padrao
+mean_loss = np.mean(losses)
+std_loss = np.std(losses)
+print("Média das perdas:", mean_loss)
+print("Desvio padrão das perdas:", std_loss)
+
+#endregion
+
+#region VISUALIZING DATA
 
 # Definir os meses do próximo ano para previsão
 ultimo_ano_mes = df_grouped['ano_mes'].max()
@@ -104,9 +130,6 @@ all_dates = [index_to_date.get(i, f"{str(ano_mes)[-2:]}-{str(ano_mes)[:4]}") for
 for mes, venda, index in zip(indices_para_predicao, previsoes, proximos_meses_ano_mes):
     print(f"Previsão de vendas para o mês {str(index)[-2:]}-{str(index)[:4]}: {venda[0]:.2f}")
 
-#endregion
-
-#region VISUALIZING DATA
 # Plotar os dados e as previsões
 plt.scatter(X, y, color='blue', label='Dados Reais')
 plt.plot(indices_para_predicao, previsoes, color='red', label='Previsões')

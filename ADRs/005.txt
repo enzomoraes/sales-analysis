@@ -1,5 +1,5 @@
 Número do ADR: 005
-Título: Criação de Script realizar regressão dos dados de venda
+Título: Agregar dados e exportá-los em csv
 Data: 08/06/2024
 Status: Pendente
 

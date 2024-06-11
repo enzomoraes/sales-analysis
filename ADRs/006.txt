@@ -1,0 +1,23 @@
+Número do ADR: 006
+Título: Adição de biblioteca para dar suporte a cross validation
+Data: 10/06/2024
+Status: Pendente
+
+Contexto
+É necessário usar cross validation para medidas estatísticas de avaliação do modelo
+
+Decisão
+Foi decidido usar scikit-learn para facilitar a aplicação de K-fold cross validation.
+
+Justificativa
+Sua fácil integração com Tensorflow e Keras é um fator determinante
+
+Consequências
+Uma dependência a mais adicionada no projeto
+
+Alternativas Consideradas
+Implementar a separação do K-fold cross validation sem uso de bibliotecas, porém seria necessário dispor de um tempo de desenvolvimento não disponível no momento
+
+Referências
+
+ADR 004
