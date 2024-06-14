@@ -2,3 +2,4 @@
 *.TPS
 **/node_modules
 !sales-data.csv
+**/__pycache__

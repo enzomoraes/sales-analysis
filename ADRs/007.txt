@@ -1,0 +1,23 @@
+Número do ADR: 007
+Título: Separação de código para avaliar modelos diferentes
+Data: 14/06/2024
+Status: Pendente
+
+Contexto
+É necessário criar uma forma de abstração para evitar duplicação de código
+
+Decisão
+Foi decidido criar um arquivo chamado lib.py, e este arquivo conterá funcoes para carregar os dados, normalizar, validar, e visualizar os dados.
+Dessa forma será possível, reutiliza-lo para avaliar modelos diferentes criando arquivos novos com o nome do modelo, sem precisar editar o código atual, mantendo dessa forma "separation of concern"
+
+Justificativa
+Reutilização de código, facilitando manutenção e extensão, usando principio "Separation of Concerns" e "Open Closed principle"
+
+Consequências
+Manutenção do código mais fácil
+
+Alternativas Consideradas
+Duplicar o código inteiro para cada modelo
+
+Referências
+SOLID
