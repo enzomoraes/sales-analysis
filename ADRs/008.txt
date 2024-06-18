@@ -1,0 +1,24 @@
+Número do ADR: 008
+Título: Utilização de scikit learn para aplicação de algoritmos
+Data: 14/06/2024
+Status: Pendente
+
+Contexto
+O Scikit learn é necessário para aplicar algoritmos de machine learning, que não são redes neurais. O Tensorflow será encarregado das redes neurais
+
+Decisão
+Foi decidido usar o scikit learn para implementar algoritmos de machine learning como regressao linear e polinomial.
+O Tensorflow, anteriormente escolhido para implementar tudo, será usado apenas nas redes neurais.
+
+Justificativa
+Scikit Learn é mais intuitivo para aplicar os algoritmos
+
+Consequências
+Refatorar arquivos que implementavam os algoritmos de Machine Learning com Tensorflow porém agora com Scikit Learn
+Refatorar arquivo lib.py para dar suporte a diferentes implementações, fazendo uso de funções passadas como parametros.
+
+Alternativas Consideradas
+Scikit Learn é o GOTO para algoritmos de ML, portanto foi considerado apenas ele
+
+Referências
+ADR 004

@@ -36,10 +36,10 @@ def loadData():
 # region VALIDATING DATA
 def validateData(data_frame):
   # Verificar se há valores NaN ou infinitos
-  if data_frame.isna().sum()[1].sum() > 0:  # Verificar valores NaN
+  if data_frame.isna().sum().iloc[0].sum() > 0:  # Verificar valores NaN
     print('there are NaN values')
     sys.exit('1')
-  if np.isinf(data_frame).sum()[1].sum() > 0:  # Verificar valores infinitos
+  if np.isinf(data_frame).sum().iloc[0].sum() > 0:  # Verificar valores infinitos
     print('there are values with infinite data')
     sys.exit('1')
 # endregion
@@ -58,8 +58,10 @@ def normalizeData(X, y):
   return (X_normalized, y_normalized, mean_X, mean_y, std_X, std_y)
 # endregion
 
+def doNothing(X_train, y_train, X_test, y_test):
+   {}
 # region MODEL TRAINING
-def evaluateModel(model, X_normalized, y_normalized):
+def evaluateModel(X_normalized, y_normalized, forEachFold = doNothing):
   # Construir o modelo de regressão
   kfold = KFold(n_splits=10, shuffle=True)
   losses = []
@@ -69,29 +71,18 @@ def evaluateModel(model, X_normalized, y_normalized):
       X_train, X_test = X_normalized[train_index], X_normalized[test_index]
       y_train, y_test = y_normalized[train_index], y_normalized[test_index]
 
-      # reseting model weights
-      tf.keras.backend.clear_session()
-
-      # Compilar o modelo com uma taxa de aprendizado menor
-      model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='mean_squared_error')
-      
-      # Treinar o modelo
-      model.fit(X_train, y_train, epochs=500, verbose=0)
-
-      # Avaliar o modelo no conjunto de teste e armazenar a perda
-      loss = model.evaluate(X_test, y_test)
+      loss = forEachFold(X_train, y_train, X_test, y_test)
       losses.append(loss)
 
   # Calcular a média das perdas e desvio padrao
   mean_loss = np.mean(losses)
   std_loss = np.std(losses)
-  print("Média das perdas:", mean_loss)
-  print("Desvio padrão das perdas:", std_loss)
+  return (losses, mean_loss, std_loss)
 
 #endregion
 
 #region VISUALIZING DATA
-def visualizeData(model, data_frame, X, y, mean_X, mean_y, std_X, std_y):
+def visualizeData(model, data_frame, X, y, mean_X, mean_y, std_X, std_y, transformInput = lambda input: input):
   # Definir os meses do próximo ano para previsão
   ultimo_ano_mes = data_frame['ano_mes'].max()
   ultimo_ano = int(str(ultimo_ano_mes)[:4])
@@ -113,17 +104,13 @@ def visualizeData(model, data_frame, X, y, mean_X, mean_y, std_X, std_y):
   indices_para_predicao_normalized = (indices_para_predicao - mean_X) / std_X
 
   # Fazer previsões
-  previsoes_normalized = model.predict(indices_para_predicao_normalized)
+  previsoes_normalized = model.predict(transformInput(indices_para_predicao_normalized))
   previsoes = previsoes_normalized * std_y + mean_y
 
   # Mapear os índices para as labels do eixo x
   # Criar um dicionário para mapear índice para ano-mês
   index_to_date = {row['indice']: f"{str(row['ano_mes'])[4:6]}-{str(row['ano_mes'])[:4]}" for _, row in data_frame.iterrows()}
   all_dates = [index_to_date.get(i, f"{str(ano_mes)[-2:]}-{str(ano_mes)[:4]}") for i, ano_mes in zip(indices_para_predicao.flatten(), list(data_frame['ano_mes']) + proximos_meses_ano_mes)]
-
-  # Exibir as previsões
-  for mes, venda, index in zip(indices_para_predicao, previsoes, proximos_meses_ano_mes):
-      print(f"Previsão de vendas para o mês {str(index)[-2:]}-{str(index)[:4]}: {venda[0]:.2f}")
 
   # Plotar os dados e as previsões
   plt.scatter(X, y, color='blue', label='Dados Reais')
@@ -141,4 +128,15 @@ def visualizeData(model, data_frame, X, y, mean_X, mean_y, std_X, std_y):
         ticks_labels.append(all_dates[index - 1])
   plt.xticks(ticks=ticks, labels=ticks_labels, rotation=90)
 
+  plt.show()
+
+#endregion
+
+#region VISUALIZING LOSS
+def visualizeLoss(loss):
+     # Plotar os dados e as previsões
+  plt.plot(loss, color='red', label='Loss')
+  plt.xlabel('Fold')
+  plt.ylabel('Loss')
+  plt.legend()
   plt.show()
