@@ -1,5 +1,4 @@
 import numpy as np
-import tensorflow as tf
 import matplotlib.pyplot as plt
 import pandas as pd
 import sys
@@ -18,7 +17,10 @@ def loadData():
 
   # Criar uma nova coluna que combine ano e mês como um número único
   df['ano_mes'] = df['ano'] * 100 + df['mes']
-
+  # Obter os índices das linhas onde ano_mes é igual a 202405 (mês está incompleto)
+  index_to_drop = df[df['ano_mes'] == 202405].index
+  df = df.drop(index_to_drop)
+  
   # Agrupar os dados por 'ano_mes' e somar as quantidades vendidas
   df_grouped = df.groupby('ano_mes')['quantidade'].sum().reset_index()
 
