@@ -17,9 +17,10 @@ def loadData():
 
   # Criar uma nova coluna que combine ano e mês como um número único
   df['ano_mes'] = df['ano'] * 100 + df['mes']
-  # Obter os índices das linhas onde ano_mes é igual a 202405 (mês está incompleto)
-  index_to_drop = df[df['ano_mes'] == 202405].index
-  df = df.drop(index_to_drop)
+
+  # Obter os índices das linhas onde é igual aos meses da páscoa removendo os outliers e ajustando para nao incluir o mes de maio de 2024 que está incompleto
+  df = df.drop(df[df['ano_mes'] == 202405].index)
+  df = df.drop(df[df['mes'].isin([3,4])].index)
   
   # Agrupar os dados por 'ano_mes' e somar as quantidades vendidas
   df_grouped = df.groupby('ano_mes')['quantidade'].sum().reset_index()
@@ -125,7 +126,7 @@ def visualizeData(model, data_frame, X, y, mean_X, mean_y, std_X, std_y, transfo
   ticks_labels = []
   for index in indices_para_predicao.flatten():
       mes = int(all_dates[index - 1][0:2])
-      if mes in [3, 5]:
+      if mes in [1]:
         ticks.append(index)
         ticks_labels.append(all_dates[index - 1])
   plt.xticks(ticks=ticks, labels=ticks_labels, rotation=90)
