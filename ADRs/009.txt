@@ -1,0 +1,22 @@
+Número do ADR: 009
+Título: Exportar os dados de vendas diárias apenas no período da Páscoa
+Data: 19/06/2024
+Status: Pendente
+
+Contexto
+Ao realizar alguns testes com vários algoritmos, foi identificado que ocorria overfitting e em outros os outliers eram extremamente consideráveis no treinamento, ocasionando uma loss alta
+
+Decisão
+Foi decidido exportar os dados apenas de vendas diárias no período da páscoa, visando não ocorrer outliers tão grandes e mantendo o foco em previsao de vendas no período da páscoa.
+
+Justificativa
+Se mantesse apenas vendas mensais da páscoa, seriam 2 meses a cada ano, e no momento temos do periodo 2011 - 2024, que não seria suficiente para o algoritmo ter um desempenho adequado
+
+Consequências
+Gerar outro arquivo .csv apenas com vendas diarias da pascoa
+
+Alternativas Consideradas
+não há
+
+Referências
+ADR 005

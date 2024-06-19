@@ -1,0 +1,25 @@
+Número do ADR: 010
+Título: Criar um único script que compare os diferentes modelos de algoritmos de forma justa
+Data: 19/06/2024
+Status: Pendente
+
+Contexto
+Ao realizar comparação de algoritmos, foi identificado que os mesmos devem ser tratados com o mesmo conjunto de dados.
+Uma vez que estamos usando cross validation com KFold, será necessário instanciar os modelos para serem treinados e comparados com os mesmos folds.
+Também há a necessidade de ajustar os hiperparametros do modelos e compará-los entre si
+
+Decisão
+Foi decidido criar um único script que crie os folds, instancie os modelos, diga quais os melhores hiperparametros, e compare-os no final.
+Esse mesmo script deve de forma visual, plotar o gráfico gerado
+
+Justificativa
+Seguir boas práticas de comparação de algoritmos
+
+Consequências
+Desconsiderar todos os arquivos gerados a partir da ADR 007 para reutilização de código, pois será tudo feito em um arquivo
+
+Alternativas Consideradas
+não há
+
+Referências
+ADR 007

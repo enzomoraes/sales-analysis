@@ -7,8 +7,9 @@ validateData(data_frame)
 
 model = tf.keras.Sequential([
   tf.keras.layers.Input(shape=(1,)),
-  tf.keras.layers.Lambda(lambda x: tf.concat([x, x**3], axis=1)),
-  tf.keras.layers.Dense(units=5, activation='sigmoid'),
+  tf.keras.layers.Dense(units=128, activation='relu'),
+  tf.keras.layers.Dense(units=256, activation='sigmoid'),
+  tf.keras.layers.Dense(units=128, activation='sigmoid'),
   tf.keras.layers.Dense(units=1)
 ])
 
