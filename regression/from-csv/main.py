@@ -139,9 +139,13 @@ mlpErrors = []
 polyErrors = []
 svrErrors = []
 
+normalizer = StandardScaler()
 for trainIndexes, testIndexes in innerKfold.split(X, y):
   X_train, y_train = X[trainIndexes], y[trainIndexes]
+  normalizer.fit(X_train)
+  X_train = normalizer.transform(X_train)
   X_test, y_test = X[testIndexes], y[testIndexes]
+  X_test = normalizer.transform(X_test)
 
   knn = KNeighborsRegressor(**remove_prefix(knnBestParams))
   knn.fit(X_train, y_train)
