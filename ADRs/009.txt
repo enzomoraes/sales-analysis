@@ -13,7 +13,7 @@ Justificativa
 Se mantesse apenas vendas mensais da páscoa, seriam 2 meses a cada ano, e no momento temos do periodo 2011 - 2024, que não seria suficiente para o algoritmo ter um desempenho adequado
 
 Consequências
-Gerar outro arquivo .csv apenas com vendas diarias da pascoa
+A partir do arquivo .csv, usar apenas os dados de vendas diarias e nao mensal
 
 Alternativas Consideradas
 não há

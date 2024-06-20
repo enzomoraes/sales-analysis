@@ -1,0 +1,22 @@
+Número do ADR: 011
+Título: Usar pipeline do sklearn para facilitar pre processamentos
+Data: 20/06/2024
+Status: Pendente
+
+Contexto
+Ao se desenvolver tudo em um único script, ficou claro que haveria muita repetição para construcao e avaliação cruzada dos modelos.
+
+Decisão
+Foi decidido usar o conceito de Pipeline do sklearn, que permite reutilizar a construcao do pre processamento dos dados evitando duplicação de código para construcao dos modelos com os dados pre processados
+
+Justificativa
+Facilidade de desenvolvimento
+
+Consequências
+Os modelos sao construido as pipelines do sklearn
+
+Alternativas Consideradas
+Duplicar o código
+
+Referências
+ADR 010
