@@ -102,6 +102,7 @@ print(f"MLP best params: {mlpBestParams}")
 
 
 poly_pipe = Pipeline(steps=[
+    ('scaler', StandardScaler()),
     ('poly', PolynomialFeatures(include_bias=False)),
     ('model', LinearRegression()),
 ])
