@@ -25,8 +25,40 @@ def loadData():
   df_grouped = df_grouped.sort_values(by='data').reset_index(drop=True)
   df_grouped['indice'] = df_grouped.index + 1  # Criar um índice sequencial começando em 1
 
+  easterDays = [
+    '2011-04-24',
+    '2012-04-8',
+    '2013-03-31',
+    '2014-04-20',
+    '2015-04-05',
+    '2016-03-27',
+    '2017-04-16',
+    '2018-04-01',
+    '2019-04-21',
+    '2020-04-12',
+    '2021-04-04',
+    '2022-04-17',
+    '2023-04-09',
+    '2024-03-31',
+              ]
+  easterDays = pd.to_datetime(easterDays)
+  df_grouped['is_holiday'] = 0
+
+  for pascoa in easterDays:
+      pascoa_index = df_grouped.index[df_grouped['data'] == pascoa].tolist()
+      if not pascoa_index:
+          # Se a data da Páscoa não for encontrada, pegar o próximo dia disponível
+          pascoa_index = df_grouped.index[df_grouped['data'] > pascoa].tolist()
+      
+      if pascoa_index:
+          pascoa_index = pascoa_index[0]
+          for i in range(11):
+              if pascoa_index - i >= 0:
+                  peso = np.exp(-0.2 * i)  # Função exponencial decrescente
+                  df_grouped.loc[pascoa_index - i, 'is_holiday'] = peso
+  
   # Separar as variáveis independentes (X) e dependentes (y)
-  X = df_grouped['indice'].values.reshape(-1, 1)
+  X = df_grouped[['indice', 'is_holiday']].values
   y = df_grouped['quantidade'].values.reshape(-1, 1)
   return (X, y, df_grouped)
 
@@ -167,9 +199,9 @@ for trainIndexes, testIndexes in innerKfold.split(X, y):
 
   polyModel = LinearRegression()
   polyFeat = PolynomialFeatures(**remove_prefix(polyBestParams), include_bias=False)
-  poly_features = polyFeat.fit_transform(X_train.reshape(-1, 1))
+  poly_features = polyFeat.fit_transform(X_train)
   polyModel.fit(poly_features, y_train)
-  poly_predictions = polyModel.predict(polyFeat.fit_transform(X_test.reshape(-1, 1)))
+  poly_predictions = polyModel.predict(polyFeat.fit_transform(X_test))
   polyError = metrics.mean_squared_error(y_test, poly_predictions)
   polyErrors.append(polyError)
 
