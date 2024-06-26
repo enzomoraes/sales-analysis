@@ -43,24 +43,25 @@ def loadData():
               ]
   easterDays = pd.to_datetime(easterDays)
   df_grouped['is_holiday'] = 0
-
+  pascoaIndexes = []
   for pascoa in easterDays:
       pascoa_index = df_grouped.index[df_grouped['data'] == pascoa].tolist()
       if not pascoa_index:
           # Se a data da Páscoa não for encontrada, pegar o próximo dia disponível
-          pascoa_index = df_grouped.index[df_grouped['data'] > pascoa].tolist()
+          pascoa = pascoa - pd.Timedelta(days=1)
+          pascoa_index = df_grouped.index[df_grouped['data'] == pascoa].tolist()
       
       if pascoa_index:
           pascoa_index = pascoa_index[0]
-          for i in range(11):
+          for i in range(15):
               if pascoa_index - i >= 0:
                   peso = np.exp(-0.2 * i)  # Função exponencial decrescente
                   df_grouped.loc[pascoa_index - i, 'is_holiday'] = peso
-  
+      pascoaIndexes.append(pascoa_index)
   # Separar as variáveis independentes (X) e dependentes (y)
   X = df_grouped[['indice', 'is_holiday']].values
   y = df_grouped['quantidade'].values.reshape(-1, 1)
-  return (X, y, df_grouped)
+  return (X, y, df_grouped, pascoaIndexes)
 
 #endregion
 
@@ -81,7 +82,7 @@ def remove_prefix(params):
   return new_params
 #endregion
 
-X, y, dataFrame = loadData()
+X, y, dataFrame, pascoaIndexes = loadData()
 
 #region Cross validation
 innerKfold = model_selection.StratifiedKFold(n_splits=10, shuffle=True, random_state=False)
@@ -171,8 +172,8 @@ mlpErrors = []
 polyErrors = []
 svrErrors = []
 
-normalizer = StandardScaler()
 for trainIndexes, testIndexes in innerKfold.split(X, y):
+  normalizer = StandardScaler()
   X_train, y_train = X[trainIndexes], y[trainIndexes]
   normalizer.fit(X_train)
   X_train = normalizer.transform(X_train)
@@ -217,6 +218,7 @@ print(f"MLP - media dos mse: \n {np.mean(mlpErrors)}")
 print(f"Poly - media dos mse: \n {np.mean(polyErrors)}")
 print(f"SVR - media dos mse: \n {np.mean(svrErrors)}")
 
+
 knn_predictions = knnGridSearch.predict(X)
 dataFrame['knn_predictions'] = knn_predictions
 
@@ -246,7 +248,7 @@ plt.plot(dataFrame['indice'], dataFrame['svr_predictions'], color='purple', labe
 ticks = []
 ticksLabels = []
 for index, date in zip(dataFrame['indice'], dataFrame['data']):
-  if date.day == 1:
+  if index in pascoaIndexes:
     ticks.append(index)
     ticksLabels.append(f"{date.day}/{date.month}/{date.year}")
 plt.xticks(ticks=ticks, labels=ticksLabels, rotation=45)
