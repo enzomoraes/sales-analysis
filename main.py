@@ -38,6 +38,7 @@ def loadData():
   df['data'] = pd.to_datetime(df['data'])
   df['mes'] = df['data'].dt.month
   df = df[~((df['mes'] == 5) & (df['data'].dt.year == 2024))]
+  df = df[df['mes'].isin([3,4])]
 
 
   # Agrupar os dados por 'data' e somar as quantidades vendidas
@@ -273,6 +274,7 @@ axs[0, 0].set_ylabel('Ammount sold')
 axs[0, 0].set_ylim(y_min, y_max)
 axs[0, 0].grid(True, axis='x', linestyle='--', linewidth=0.5, alpha=0.7)
 axs[0, 0].legend()
+axs[0, 0].axhline(y=0, color='black', linestyle='--', linewidth=1.2)  # Linha tracejada em y = 0
 
 # Previsões KNN
 axs[0, 1].scatter(indices, resultsDF['knn_predictions'], color='gray', label='Predicted KNN', marker="o", alpha=0.3)
@@ -281,6 +283,7 @@ axs[0, 1].set_ylabel('Ammount sold')
 axs[0, 1].set_ylim(y_min, y_max)
 axs[0, 1].grid(True, axis='x', linestyle='--', linewidth=0.5, alpha=0.7)
 axs[0, 1].legend()
+axs[0, 1].axhline(y=0, color='black', linestyle='--', linewidth=1.2)  # Linha tracejada em y = 0
 
 # Previsões Linear
 axs[1, 0].scatter(indices, resultsDF['linear_predictions'], color='green', label='Predicted Linear', marker="o", alpha=0.3)
@@ -289,6 +292,7 @@ axs[1, 0].set_ylabel('Ammount sold')
 axs[1, 0].set_ylim(y_min, y_max)
 axs[1, 0].grid(True, axis='x', linestyle='--', linewidth=0.5, alpha=0.7)
 axs[1, 0].legend()
+axs[1, 0].axhline(y=0, color='black', linestyle='--', linewidth=1.2)  # Linha tracejada em y = 0
 
 # Previsões MLP
 axs[1, 1].scatter(indices, resultsDF['mlp_predictions'], color='yellow', label='Predicted MLP', marker="o", alpha=0.3)
@@ -297,6 +301,7 @@ axs[1, 1].set_ylabel('Ammount sold')
 axs[1, 1].set_ylim(y_min, y_max)
 axs[1, 1].grid(True, axis='x', linestyle='--', linewidth=0.5, alpha=0.7)
 axs[1, 1].legend()
+axs[1, 1].axhline(y=0, color='black', linestyle='--', linewidth=1.2)  # Linha tracejada em y = 0
 
 # Previsões Poly
 axs[2, 0].scatter(indices, resultsDF['poly_predictions'], color='orange', label='Predicted Poly', marker="o", alpha=0.3)
@@ -305,6 +310,7 @@ axs[2, 0].set_ylabel('Ammount sold')
 axs[2, 0].set_ylim(y_min, y_max)
 axs[2, 0].grid(True, axis='x', linestyle='--', linewidth=0.5, alpha=0.7)
 axs[2, 0].legend()
+axs[2, 0].axhline(y=0, color='black', linestyle='--', linewidth=1.2)  # Linha tracejada em y = 0
 
 # Previsões SVR
 axs[2, 1].scatter(indices, resultsDF['svr_predictions'], color='purple', label='Predicted SVR', marker="o", alpha=0.3)
@@ -313,6 +319,7 @@ axs[2, 1].set_ylabel('Ammount sold')
 axs[2, 1].set_ylim(y_min, y_max)
 axs[2, 1].grid(True, axis='x', linestyle='--', linewidth=0.5, alpha=0.7)
 axs[2, 1].legend()
+axs[2, 1].axhline(y=0, color='black', linestyle='--', linewidth=1.2)  # Linha tracejada em y = 0
 
 # Adicionando ticks e labels
 ticks = []
