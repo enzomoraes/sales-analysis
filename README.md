@@ -49,3 +49,6 @@ then follow the ETL folders commands
 
 - ### Load folder:  
     contains the tools necessary to load the content extracted into a database.  
+
+- ### main.py  
+    the regressions are made there. Try running it to see the plots!!
