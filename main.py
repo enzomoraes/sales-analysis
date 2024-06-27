@@ -37,8 +37,8 @@ def loadData():
   # Converter a coluna de data para o tipo datetime
   df['data'] = pd.to_datetime(df['data'])
   df['mes'] = df['data'].dt.month
-  df = df[~((df['mes'] == 5) & (df['data'].dt.year == 2024))]
-  df = df[df['mes'].isin([3,4])]
+  df = df[~((df['mes'] == 5) & (df['data'].dt.year == 2024))] # excluindo mes de maio 2024 que está incompleto
+  df = df[df['mes'].isin([3,4])] # levando em consideração apenas os dados dos meses relativos a pascoa
 
 
   # Agrupar os dados por 'data' e somar as quantidades vendidas
@@ -265,7 +265,7 @@ fig, axs = plt.subplots(3, 2, figsize=(15, 15))
 fig.tight_layout(pad=5.0)
 
 y_min = min(y_test.min(), resultsDF.min().min())
-y_max = max(y_test.max(), resultsDF.max().max())
+y_max = max(y_test.max(), resultsDF.max().max()) + 20
 
 # Dados Reais
 axs[0, 0].scatter(indices, y_test, color='blue', label='Real data', marker="o", alpha=0.3)
@@ -295,7 +295,7 @@ axs[1, 0].legend()
 axs[1, 0].axhline(y=0, color='black', linestyle='--', linewidth=1.2)  # Linha tracejada em y = 0
 
 # Previsões MLP
-axs[1, 1].scatter(indices, resultsDF['mlp_predictions'], color='yellow', label='Predicted MLP', marker="o", alpha=0.3)
+axs[1, 1].scatter(indices, resultsDF['mlp_predictions'], color='red', label='Predicted MLP', marker="o", alpha=0.3)
 axs[1, 1].set_title('Predicted MLP')
 axs[1, 1].set_ylabel('Ammount sold')
 axs[1, 1].set_ylim(y_min, y_max)
