@@ -2,4 +2,6 @@
 *.TPS
 **/node_modules
 !sales-data.csv
+!selic-copom.csv
+!consolidated.csv
 **/__pycache__

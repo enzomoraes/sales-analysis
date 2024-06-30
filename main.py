@@ -1,13 +1,15 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn import model_selection, metrics
 from sklearn.neighbors import KNeighborsRegressor
-from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+from sklearn.preprocessing import MinMaxScaler, PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVR
-import matplotlib.pyplot as plt
+from easterDays import getEasterDays 
+
 
 #region utils
 def remove_prefix(params):
@@ -24,93 +26,46 @@ def remove_prefix(params):
     new_key = key.split("__")[1]  # Split and remove the first part (knn__)
     new_params[new_key] = value
   return new_params
-
-def week_of_month(date_value):
-  week = date_value.isocalendar()[1] - date_value.replace(day=1).isocalendar()[1] + 1
-  return date_value.isocalendar()[1] if week < 0 else week
 #endregion
 
 #region Loading data
 def loadData():
-  df = pd.read_csv('sales-data.csv')
+  dataFrame = pd.read_csv('consolidated.csv')
+  dataFrame['data'] = pd.to_datetime(dataFrame['data'])
 
-  # Converter a coluna de data para o tipo datetime
-  df['data'] = pd.to_datetime(df['data'])
-  df['mes'] = df['data'].dt.month
-  df = df[~((df['mes'] == 5) & (df['data'].dt.year == 2024))] # excluindo mes de maio 2024 que está incompleto
-  df = df[df['mes'].isin([3,4])] # levando em consideração apenas os dados dos meses relativos a pascoa
-
-
-  # Agrupar os dados por 'data' e somar as quantidades vendidas
-  df_grouped = df.groupby('data')['quantidade'].sum().reset_index()
-
-  # Ordenar os dados pela data e resetar o índice para criar um índice sequencial
-  df_grouped = df_grouped.sort_values(by='data').reset_index(drop=True)
-  df_grouped['indice'] = df_grouped.index + 1  # Criar um índice sequencial começando em 1
-
-  for i in range(0,7):
-        df_grouped[f'weekday_{i}'] = df_grouped['data'].apply(lambda x: 1 if x.weekday() == i else 0)
-
-  for i in range(1, 6):
-      df_grouped[f'week_of_month_{i}'] = df_grouped['data'].apply(lambda x: 1 if week_of_month(x) == i else 0)
-      
- # Adicionar colunas de vendas dos dias anteriores
-  for i in range(1, 6):
-      df_grouped[f'previous_day_sales_{i}'] = df_grouped['quantidade'].shift(i)
-
-  # adicionando feature easter_influence
-  df_grouped['easter_influence'] = 0
-  easterDays = [
-    '2011-04-24',
-    '2012-04-8',
-    '2013-03-31',
-    '2014-04-20',
-    '2015-04-05',
-    '2016-03-27',
-    '2017-04-16',
-    '2018-04-01',
-    '2019-04-21',
-    '2020-04-12',
-    '2021-04-04',
-    '2022-04-17',
-    '2023-04-09',
-    '2024-03-31',
-              ]
-  easterDays = pd.to_datetime(easterDays)
-
-  pascoaIndexes = []
-  for pascoa in easterDays:
-      pascoa_index = df_grouped.index[df_grouped['data'] == pascoa].tolist()
-      if not pascoa_index:
+  # adicionando feature days_until_easter
+  easterDays = getEasterDays()
+  easterIndexes = []
+  for easter in easterDays:
+    easterIndex = dataFrame.index[dataFrame['data'] == easter].tolist()
+    if not easterIndex:
           # Se a data da Páscoa não for encontrada, pegar o próximo dia disponível
-          pascoa = pascoa - pd.Timedelta(days=1)
-          pascoa_index = df_grouped.index[df_grouped['data'] == pascoa].tolist()
+          easter = easter - pd.Timedelta(days=1)
+          easterIndex = dataFrame.index[dataFrame['data'] == easter].tolist()
       
-      if pascoa_index:
-          pascoa_index = pascoa_index[0]
-          for i in range(15):
-              if pascoa_index - i >= 0:
-                  peso = np.exp(-0.2 * i)  # Função exponencial decrescente
-                  df_grouped.loc[pascoa_index - i, 'easter_influence'] = peso
-      pascoaIndexes.append(pascoa_index)
+    if easterIndex:
+        easterIndex = easterIndex[0]
+    easterIndexes.append(easterIndex)
+
+
   # Separar as variáveis independentes (X) e dependentes (y)
-  X = df_grouped[['easter_influence', 'weekday_0', 'weekday_1', 'weekday_2', 'weekday_3', 'weekday_4', 'weekday_5', 'weekday_6', 'week_of_month_1', 'week_of_month_2', 'week_of_month_3', 'week_of_month_4', 'week_of_month_5']].values
-  # X = df_grouped[['indice', 'easter_influence', 'week_of_month_1', 'week_of_month_2', 'week_of_month_3', 'week_of_month_4', 'week_of_month_5']].values
-  y = df_grouped['quantidade'].values.reshape(-1,  1)
-  return (X, y, df_grouped, pascoaIndexes)
+  # X = dataFrame[['easter_influence', 'selic', 'days_until_easter', 'weekday_0', 'weekday_1', 'weekday_2', 'weekday_3', 'weekday_4', 'weekday_5', 'weekday_6', 'week_of_month_1', 'week_of_month_2', 'week_of_month_3', 'week_of_month_4', 'week_of_month_5']].values
+  X = dataFrame[['selic', 'days_since_selic_update', 'days_until_easter', 'is_weekend', 'previous_day_sales_1', 'previous_day_sales_2', 'previous_day_sales_3', 'previous_day_sales_4', 'previous_day_sales_5']].values
+  y = dataFrame['quantidade'].values.reshape(-1,  1)
+  return (X, y, dataFrame, easterIndexes)
 
 #endregion
 
-X, y, dataFrame, pascoaIndexes = loadData()
-dataFrame.to_csv('newdata.csv')
+X, y, dataFrame, easterIndexes = loadData()
+
 #region Cross validation
-innerKfold = model_selection.KFold(n_splits=10, shuffle=False)
-outerKFolds = model_selection.KFold(n_splits=3, shuffle=False)
+innerKfold = model_selection.KFold(n_splits=10, shuffle=True)
+outerKFolds = model_selection.KFold(n_splits=3, shuffle=True)
 X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, test_size=0.16, shuffle=False)
 
 #region parameters tuning
 knn_pipe = Pipeline(steps=[
-  ('scaler', StandardScaler()),
+  ('scaler', MinMaxScaler()),
   ('knn', KNeighborsRegressor()),
 ])
 knnGridSearch = model_selection.GridSearchCV(
@@ -118,28 +73,14 @@ knnGridSearch = model_selection.GridSearchCV(
     param_grid={'knn__n_neighbors': list(np.arange(1, 15)), 'knn__weights':['uniform', 'distance'], 'knn__metric': ['manhattan', 'euclidean', 'minkowski']},
     scoring='neg_mean_absolute_error',
     cv=outerKFolds,
-    refit=True
+    refit=True,
+    error_score='raise'
 )
 knnGridSearch.fit(X_train, y_train)
 knnBestParams = knnGridSearch.best_params_
-print(f"KNN best params: {knnBestParams}")
-
-linear_pipe = Pipeline(steps=[
-  ('scaler', StandardScaler()),
-  ('linear', LinearRegression()),
-])
-linearGridSearch = model_selection.GridSearchCV(
-  estimator=linear_pipe,
-  cv=outerKFolds,
-  param_grid={},
-  scoring='neg_mean_absolute_error', 
-  refit=True)
-linearGridSearch.fit(X_train, y_train)
-linearBestParams = linearGridSearch.best_params_
-print(f"Linear best params: {linearBestParams}")
 
 mlp_pipe = Pipeline(steps=[
-  ('scaler', StandardScaler()),
+  ('scaler', MinMaxScaler()),
   ('mlp', MLPRegressor()),
 ])
 mlpGridSearch = model_selection.GridSearchCV(
@@ -151,27 +92,37 @@ mlpGridSearch = model_selection.GridSearchCV(
   refit=True)
 mlpGridSearch.fit(X_train, y_train.ravel())
 mlpBestParams = mlpGridSearch.best_params_
-print(f"MLP best params: {mlpBestParams}")
 
+linear_pipe = Pipeline(steps=[
+  ('scaler', MinMaxScaler()),
+  ('linear', LinearRegression()),
+])
+linearGridSearch = model_selection.GridSearchCV(
+  estimator=linear_pipe,
+  cv=outerKFolds,
+  param_grid={},
+  scoring='neg_mean_absolute_error', 
+  refit=True)
+linearGridSearch.fit(X_train, y_train)
+linearBestParams = linearGridSearch.best_params_
 
 poly_pipe = Pipeline(steps=[
-    ('scaler', StandardScaler()),
-    ('poly', PolynomialFeatures(include_bias=False)),
+    ('scaler', MinMaxScaler()),
+    ('poly', PolynomialFeatures()),
     ('model', LinearRegression()),
 ])
 polyGridSearch = model_selection.GridSearchCV(
     estimator=poly_pipe,
-    param_grid={'poly__degree': np.arange(1, 5)},
+    param_grid={'poly__degree': np.arange(1, 5), 'poly__include_bias': [False]},
     scoring='neg_mean_absolute_error',
     cv=outerKFolds,
     refit=True
 )
 polyGridSearch.fit(X_train, y_train)
 polyBestParams = polyGridSearch.best_params_
-print(f"Poly best params: {polyBestParams}")
 
 svr_pipe = Pipeline(steps=[
-  ('scaler', StandardScaler()),
+  ('scaler', MinMaxScaler()),
   ('svr', SVR()),
 ])
 svrGridSearch = model_selection.GridSearchCV(
@@ -183,17 +134,31 @@ svrGridSearch = model_selection.GridSearchCV(
 )
 svrGridSearch.fit(X_train, y_train.ravel())
 svrBestParams = svrGridSearch.best_params_
+
+print(f"KNN best params: {knnBestParams}")
+print(f"MLP best params: {mlpBestParams}")
+print(f"Linear best params: {linearBestParams}")
+print(f"Poly best params: {polyBestParams}")
 print(f"svr best params: {svrBestParams}")
 
-
-knnErrors = []
-linearRegressionErrors = []
-mlpErrors = []
-polyErrors = []
-svrErrors = []
+knnErrorsMAE = []
+knnErrorsMSE = []
+knnErrorsR2 = []
+mlpErrorsMAE = []
+mlpErrorsMSE = []
+mlpErrorsR2 = []
+linearRegressionErrorsMAE = []
+linearRegressionErrorsMSE = []
+linearRegressionErrorsR2 = []
+polyErrorsMAE = []
+polyErrorsMSE = []
+polyErrorsR2 = []
+svrErrorsMAE = []
+svrErrorsMSE = []
+svrErrorsR2 = []
 
 for trainIndexes, testIndexes in innerKfold.split(X, y):
-  normalizer = StandardScaler()
+  normalizer = MinMaxScaler()
   X_train_internal, y_train_internal = X[trainIndexes], y[trainIndexes]
   normalizer.fit(X_train_internal)
   X_train_internal = normalizer.transform(X_train_internal)
@@ -203,57 +168,105 @@ for trainIndexes, testIndexes in innerKfold.split(X, y):
   knn = KNeighborsRegressor(**remove_prefix(knnBestParams))
   knn.fit(X_train_internal, y_train_internal)
   knn_predictions = knn.predict(X_test_internal)
-  knnError = metrics.mean_absolute_error(y_test_internal, knn_predictions)
-  knnErrors.append(knnError)
+  knnErrorMAE = metrics.mean_absolute_error(y_test_internal, knn_predictions)
+  knnErrorMSE = metrics.mean_squared_error(y_test_internal, knn_predictions)
+  knnErrorR2 = metrics.r2_score(y_test_internal, knn_predictions)
+  knnErrorsMAE.append(knnErrorMAE)
+  knnErrorsMSE.append(knnErrorMSE)
+  knnErrorsR2.append(knnErrorR2)
+
+  mlp = MLPRegressor(**remove_prefix(mlpBestParams))
+  mlp.fit(X_train_internal, y_train_internal.ravel())
+  mlp_predictions = mlp.predict(X_test_internal)
+  mlpErrorMAE = metrics.mean_absolute_error(y_test_internal, mlp_predictions)
+  mlpErrorMSE = metrics.mean_squared_error(y_test_internal, mlp_predictions)
+  mlpErrorR2 = metrics.r2_score(y_test_internal, mlp_predictions)
+  mlpErrorsMAE.append(mlpErrorMAE)
+  mlpErrorsMSE.append(mlpErrorMSE)
+  mlpErrorsR2.append(mlpErrorR2)
 
   linearRegression = LinearRegression(**remove_prefix(linearBestParams))
   linearRegression.fit(X_train_internal, y_train_internal)
   linear_predictions = linearRegression.predict(X_test_internal)
-  linearError = metrics.mean_absolute_error(y_test_internal, linear_predictions)
-  linearRegressionErrors.append(linearError)
-  
-  mlp = MLPRegressor(**remove_prefix(mlpBestParams))
-  mlp.fit(X_train_internal, y_train_internal.ravel())
-  mlp_predictions = mlp.predict(X_test_internal)
-  mlpError = metrics.mean_absolute_error(y_test_internal, mlp_predictions)
-  mlpErrors.append(mlpError)
+  linearErrorMAE = metrics.mean_absolute_error(y_test_internal, linear_predictions)
+  linearErrorMSE = metrics.mean_squared_error(y_test_internal, linear_predictions)
+  linearRegressionErrorR2 = metrics.r2_score(y_test_internal, linear_predictions)
+  linearRegressionErrorsMAE.append(linearErrorMAE)
+  linearRegressionErrorsMSE.append(linearErrorMSE)
+  linearRegressionErrorsR2.append(linearRegressionErrorR2)
+
 
   polyModel = LinearRegression()
-  polyFeat = PolynomialFeatures(**remove_prefix(polyBestParams), include_bias=False)
+  polyFeat = PolynomialFeatures(**remove_prefix(polyBestParams))
   poly_features = polyFeat.fit_transform(X_train_internal)
   polyModel.fit(poly_features, y_train_internal)
   poly_predictions = polyModel.predict(polyFeat.fit_transform(X_test_internal))
-  polyError = metrics.mean_absolute_error(y_test_internal, poly_predictions)
-  polyErrors.append(polyError)
+  polyErrorMAE = metrics.mean_absolute_error(y_test_internal, poly_predictions)
+  polyErrorMSE = metrics.mean_squared_error(y_test_internal, poly_predictions)
+  polyErrorR2 = metrics.r2_score(y_test_internal, poly_predictions)
+  polyErrorsMAE.append(polyErrorMAE)
+  polyErrorsMSE.append(polyErrorMSE)
+  polyErrorsR2.append(polyErrorR2)
 
   svr = SVR(**remove_prefix(svrBestParams))
   svr.fit(X_train_internal, y_train_internal.ravel())
   svr_predictions = svr.predict(X_test_internal)
-  svrError = metrics.mean_absolute_error(y_test_internal, svr_predictions)
-  svrErrors.append(svrError)
+  svrErrorMAE = metrics.mean_absolute_error(y_test_internal, svr_predictions)
+  svrErrorMSE = metrics.mean_squared_error(y_test_internal, svr_predictions)
+  svrErrorR2 = metrics.r2_score(y_test_internal, svr_predictions)
+  svrErrorsMAE.append(svrErrorMAE)
+  svrErrorsMSE.append(svrErrorMSE)
+  svrErrorsR2.append(svrErrorR2)
 
-print(f"KNN - media dos mae: \n {np.mean(knnErrors)}")
-print(f"Linear regression - media dos mae: \n {np.mean(linearRegressionErrors)}")
-print(f"MLP - media dos mae: \n {np.mean(mlpErrors)}")
-print(f"Poly - media dos mae: \n {np.mean(polyErrors)}")
-print(f"SVR - media dos mae: \n {np.mean(svrErrors)}")
+print(f"KNN - media dos MAE 10-fold: {np.mean(knnErrorsMAE)}")
+print(f"KNN - media dos MSE 10-fold: {np.mean(knnErrorsMSE)}")
+print(f"KNN - media dos R2 10-fold: {np.mean(knnErrorsR2)}")
+print(f"MLP - media dos MAE 10-fold: {np.mean(mlpErrorsMAE)}")
+print(f"MLP - media dos MSE 10-fold: {np.mean(mlpErrorsMSE)}")
+print(f"MLP - media dos R2 10-fold: {np.mean(mlpErrorsR2)}")
+print(f"Linear - media dos MAE 10-fold: {np.mean(linearRegressionErrorsMAE)}")
+print(f"Linear - media dos MSE 10-fold: {np.mean(linearRegressionErrorsMSE)}")
+print(f"Linear - media dos R2 10-fold: {np.mean(linearRegressionErrorsR2)}")
+print(f"Poly - media dos MAE 10-fold: {np.mean(polyErrorsMAE)}")
+print(f"Poly - media dos MSE 10-fold: {np.mean(polyErrorsMSE)}")
+print(f"Poly - media dos R2 10-fold: {np.mean(polyErrorsR2)}")
+print(f"SVR - media dos MAE 10-fold: {np.mean(svrErrorsMAE)}")
+print(f"SVR - media dos MSE 10-fold: {np.mean(svrErrorsMSE)}")
+print(f"SVR - media dos R2 10-fold: {np.mean(svrErrorsR2)}")
 
 resultsDF = pd.DataFrame(y_test)
 
 knn_predictions = knnGridSearch.predict(X_test)
 resultsDF['knn_predictions'] = knn_predictions
+print(f"KNN - media dos MAE test: {metrics.mean_absolute_error(y_test, knn_predictions)}")
+print(f"KNN - media dos MSE test: {metrics.mean_squared_error(y_test, knn_predictions)}")
+print(f"KNN - media dos R2 test: {metrics.r2_score(y_test, knn_predictions)}")
 
 linear_predictions = linearGridSearch.predict(X_test)
 resultsDF['linear_predictions'] = linear_predictions
+print(f"Linear - media dos MAE test: {metrics.mean_absolute_error(y_test, linear_predictions)}")
+print(f"Linear - media dos MSE test: {metrics.mean_squared_error(y_test, linear_predictions)}")
+print(f"Linear - media dos R2 test: {metrics.r2_score(y_test, linear_predictions)}")
 
 mlp_predictions = mlpGridSearch.predict(X_test)
 resultsDF['mlp_predictions'] = mlp_predictions
+print(f"MLP - media dos MAE test: {metrics.mean_absolute_error(y_test, mlp_predictions)}")
+print(f"MLP - media dos MSE test: {metrics.mean_squared_error(y_test, mlp_predictions)}")
+print(f"MLP - media dos R2 test: {metrics.r2_score(y_test, mlp_predictions)}")
 
 poly_predictions = polyGridSearch.predict(X_test)
 resultsDF['poly_predictions'] = poly_predictions
+print(f"Poly - media dos MAE test: {metrics.mean_absolute_error(y_test, poly_predictions)}")
+print(f"Poly - media dos MSE test: {metrics.mean_squared_error(y_test, poly_predictions)}")
+print(f"Poly - media dos R2 test: {metrics.r2_score(y_test, poly_predictions)}")
 
 svr_predictions = svrGridSearch.predict(X_test)
 resultsDF['svr_predictions'] = svr_predictions
+print(f"SVR - media dos MAE test: {metrics.mean_absolute_error(y_test, svr_predictions)}")
+print(f"SVR - media dos MSE test: {metrics.mean_squared_error(y_test, svr_predictions)}")
+print(f"SVR - media dos R2 test: {metrics.r2_score(y_test, svr_predictions)}")
+
+resultsDF.to_csv('results.csv')
 
 #endregion
 #endregion
@@ -285,18 +298,18 @@ axs[0, 1].grid(True, axis='x', linestyle='--', linewidth=0.5, alpha=0.7)
 axs[0, 1].legend()
 axs[0, 1].axhline(y=0, color='black', linestyle='--', linewidth=1.2)  # Linha tracejada em y = 0
 
-# Previsões Linear
-axs[1, 0].scatter(indices, resultsDF['linear_predictions'], color='green', label='Predicted Linear', marker="o", alpha=0.3)
-axs[1, 0].set_title('Predicted Linear')
+# Previsões MLP
+axs[1, 0].scatter(indices, resultsDF['mlp_predictions'], color='red', label='Predicted MLP', marker="o", alpha=0.3)
+axs[1, 0].set_title('Predicted MLP')
 axs[1, 0].set_ylabel('Ammount sold')
 axs[1, 0].set_ylim(y_min, y_max)
 axs[1, 0].grid(True, axis='x', linestyle='--', linewidth=0.5, alpha=0.7)
 axs[1, 0].legend()
 axs[1, 0].axhline(y=0, color='black', linestyle='--', linewidth=1.2)  # Linha tracejada em y = 0
 
-# Previsões MLP
-axs[1, 1].scatter(indices, resultsDF['mlp_predictions'], color='red', label='Predicted MLP', marker="o", alpha=0.3)
-axs[1, 1].set_title('Predicted MLP')
+# Previsões Linear
+axs[1, 1].scatter(indices, resultsDF['linear_predictions'], color='green', label='Predicted Linear', marker="o", alpha=0.3)
+axs[1, 1].set_title('Predicted Linear')
 axs[1, 1].set_ylabel('Ammount sold')
 axs[1, 1].set_ylim(y_min, y_max)
 axs[1, 1].grid(True, axis='x', linestyle='--', linewidth=0.5, alpha=0.7)
@@ -325,7 +338,7 @@ axs[2, 1].axhline(y=0, color='black', linestyle='--', linewidth=1.2)  # Linha tr
 ticks = []
 ticksLabels = []
 for index, date, dataIndex in zip(indices, dataFrame['data'].tail(len(indices)), dataFrame['indice'].tail(len(indices))):
-    if dataIndex in pascoaIndexes:
+    if dataIndex in easterIndexes:
         ticks.append(index)
         ticksLabels.append(f"{date.day}/{date.month}/{date.year}")
 

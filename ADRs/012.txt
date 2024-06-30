@@ -1,0 +1,23 @@
+Número do ADR: 012
+Título: Separate data extraction and feature creations into different files
+Data: 30/06/2024
+Status: Pendente
+
+Contexto
+Visando deixar o script de treinamento e visualização do modelo mais limpo e consumir menos memoria, foi necesário separar as lógicas relativas a esses procedimentos
+
+Decisão
+Foi decidido criar um arquivo para agregar os dados de várias fontes e criar um novo arquivo .csv consolidado
+
+Justificativa
+Menor consumo de memoria no treinamento
+Não ha necessidade de recriar o dataset toda vez. Manter o dataset consolidado
+
+Consequências
+Código de treinamento mais rapido
+Arquivo csv consolidado com os dados
+
+Alternativas Consideradas
+
+
+Referências
