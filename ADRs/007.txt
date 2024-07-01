@@ -1,7 +1,7 @@
 Número do ADR: 007
 Título: Separação de código para avaliar modelos diferentes
 Data: 14/06/2024
-Status: Pendente
+Status: Aceito
 
 Contexto
 É necessário criar uma forma de abstração para evitar duplicação de código

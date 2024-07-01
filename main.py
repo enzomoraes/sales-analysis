@@ -218,55 +218,84 @@ for trainIndexes, testIndexes in innerKfold.split(X, y):
   svrErrorsMSE.append(svrErrorMSE)
   svrErrorsR2.append(svrErrorR2)
 
-print(f"KNN - media dos MAE 10-fold: {np.mean(knnErrorsMAE)}")
-print(f"KNN - media dos MSE 10-fold: {np.mean(knnErrorsMSE)}")
-print(f"KNN - media dos R2 10-fold: {np.mean(knnErrorsR2)}")
-print(f"MLP - media dos MAE 10-fold: {np.mean(mlpErrorsMAE)}")
-print(f"MLP - media dos MSE 10-fold: {np.mean(mlpErrorsMSE)}")
-print(f"MLP - media dos R2 10-fold: {np.mean(mlpErrorsR2)}")
-print(f"Linear - media dos MAE 10-fold: {np.mean(linearRegressionErrorsMAE)}")
-print(f"Linear - media dos MSE 10-fold: {np.mean(linearRegressionErrorsMSE)}")
-print(f"Linear - media dos R2 10-fold: {np.mean(linearRegressionErrorsR2)}")
-print(f"Poly - media dos MAE 10-fold: {np.mean(polyErrorsMAE)}")
-print(f"Poly - media dos MSE 10-fold: {np.mean(polyErrorsMSE)}")
-print(f"Poly - media dos R2 10-fold: {np.mean(polyErrorsR2)}")
-print(f"SVR - media dos MAE 10-fold: {np.mean(svrErrorsMAE)}")
-print(f"SVR - media dos MSE 10-fold: {np.mean(svrErrorsMSE)}")
-print(f"SVR - media dos R2 10-fold: {np.mean(svrErrorsR2)}")
+validationMetrics = {
+    'Model': ['KNN', 'MLP', 'Linear', 'Poly', 'SVR'],
+    'Mean MAE': [
+        np.mean(knnErrorsMAE),
+        np.mean(mlpErrorsMAE),
+        np.mean(linearRegressionErrorsMAE),
+        np.mean(polyErrorMAE),
+        np.mean(svrErrorMAE),
+    ],
+    'Mean MSE': [
+        np.mean(knnErrorsMSE),
+        np.mean(mlpErrorsMSE),
+        np.mean(linearRegressionErrorsMSE),
+        np.mean(polyErrorMSE),
+        np.mean(svrErrorMSE),
+    ],
+    'Mean R2': [
+        np.mean(knnErrorsR2),
+        np.mean(mlpErrorsR2),
+        np.mean(linearRegressionErrorsR2),
+        np.mean(polyErrorR2),
+        np.mean(svrErrorR2),
+    ]
+}
 
-resultsDF = pd.DataFrame(y_test)
-
+# Make predictions
 knn_predictions = knnGridSearch.predict(X_test)
-resultsDF['knn_predictions'] = knn_predictions
-print(f"KNN - media dos MAE test: {metrics.mean_absolute_error(y_test, knn_predictions)}")
-print(f"KNN - media dos MSE test: {metrics.mean_squared_error(y_test, knn_predictions)}")
-print(f"KNN - media dos R2 test: {metrics.r2_score(y_test, knn_predictions)}")
-
 linear_predictions = linearGridSearch.predict(X_test)
-resultsDF['linear_predictions'] = linear_predictions
-print(f"Linear - media dos MAE test: {metrics.mean_absolute_error(y_test, linear_predictions)}")
-print(f"Linear - media dos MSE test: {metrics.mean_squared_error(y_test, linear_predictions)}")
-print(f"Linear - media dos R2 test: {metrics.r2_score(y_test, linear_predictions)}")
-
 mlp_predictions = mlpGridSearch.predict(X_test)
-resultsDF['mlp_predictions'] = mlp_predictions
-print(f"MLP - media dos MAE test: {metrics.mean_absolute_error(y_test, mlp_predictions)}")
-print(f"MLP - media dos MSE test: {metrics.mean_squared_error(y_test, mlp_predictions)}")
-print(f"MLP - media dos R2 test: {metrics.r2_score(y_test, mlp_predictions)}")
-
 poly_predictions = polyGridSearch.predict(X_test)
-resultsDF['poly_predictions'] = poly_predictions
-print(f"Poly - media dos MAE test: {metrics.mean_absolute_error(y_test, poly_predictions)}")
-print(f"Poly - media dos MSE test: {metrics.mean_squared_error(y_test, poly_predictions)}")
-print(f"Poly - media dos R2 test: {metrics.r2_score(y_test, poly_predictions)}")
-
 svr_predictions = svrGridSearch.predict(X_test)
-resultsDF['svr_predictions'] = svr_predictions
-print(f"SVR - media dos MAE test: {metrics.mean_absolute_error(y_test, svr_predictions)}")
-print(f"SVR - media dos MSE test: {metrics.mean_squared_error(y_test, svr_predictions)}")
-print(f"SVR - media dos R2 test: {metrics.r2_score(y_test, svr_predictions)}")
 
-resultsDF.to_csv('results.csv')
+# Create a DataFrame to store the predictions and metrics
+predictionDataFrame = pd.DataFrame({
+    'y_test': y_test.flatten(),
+    'knn_predictions': knn_predictions.flatten(),
+    'mlp_predictions': mlp_predictions.flatten(),
+    'linear_predictions': linear_predictions.flatten(),
+    'poly_predictions': poly_predictions.flatten(),
+    'svr_predictions': svr_predictions.flatten()
+})
+
+# Calculate metrics for each model
+predictionMetrics = {
+    'Model': ['KNN', 'MLP', 'Linear', 'Poly', 'SVR'],
+    'MAE': [
+        metrics.mean_absolute_error(y_test, knn_predictions),
+        metrics.mean_absolute_error(y_test, mlp_predictions),
+        metrics.mean_absolute_error(y_test, linear_predictions),
+        metrics.mean_absolute_error(y_test, poly_predictions),
+        metrics.mean_absolute_error(y_test, svr_predictions)
+    ],
+    'MSE': [
+        metrics.mean_squared_error(y_test, knn_predictions),
+        metrics.mean_squared_error(y_test, mlp_predictions),
+        metrics.mean_squared_error(y_test, linear_predictions),
+        metrics.mean_squared_error(y_test, poly_predictions),
+        metrics.mean_squared_error(y_test, svr_predictions)
+    ],
+    'R2': [
+        metrics.r2_score(y_test, knn_predictions),
+        metrics.r2_score(y_test, mlp_predictions),
+        metrics.r2_score(y_test, linear_predictions),
+        metrics.r2_score(y_test, poly_predictions),
+        metrics.r2_score(y_test, svr_predictions)
+    ]
+}
+
+# Create a DataFrame for validation_metrics
+validationMetrics = pd.DataFrame(validationMetrics)
+
+# Create a DataFrame for metrics
+predictionMetrics = pd.DataFrame(predictionMetrics)
+
+# Save predictions and metrics to CSV files
+validationMetrics.to_csv('validation-metrics.csv', index=False)
+predictionMetrics.to_csv('predictions-metrics.csv', index=False)
+predictionDataFrame.to_csv('predictions.csv', index=False)
 
 #endregion
 #endregion
@@ -277,58 +306,58 @@ indices = range(len(X_test))
 fig, axs = plt.subplots(3, 2, figsize=(15, 15))
 fig.tight_layout(pad=5.0)
 
-y_min = min(y_test.min(), resultsDF.min().min())
-y_max = max(y_test.max(), resultsDF.max().max()) + 20
+y_min = min(y_test.min(), predictionDataFrame.min().min())
+y_max = max(y_test.max(), predictionDataFrame.max().max()) + 20
 
 # Dados Reais
 axs[0, 0].scatter(indices, y_test, color='blue', label='Real data', marker="o", alpha=0.3)
 axs[0, 0].set_title('Real data')
-axs[0, 0].set_ylabel('Ammount sold')
+axs[0, 0].set_ylabel('Amount sold')
 axs[0, 0].set_ylim(y_min, y_max)
 axs[0, 0].grid(True, axis='x', linestyle='--', linewidth=0.5, alpha=0.7)
 axs[0, 0].legend()
 axs[0, 0].axhline(y=0, color='black', linestyle='--', linewidth=1.2)  # Linha tracejada em y = 0
 
 # Previsões KNN
-axs[0, 1].scatter(indices, resultsDF['knn_predictions'], color='gray', label='Predicted KNN', marker="o", alpha=0.3)
+axs[0, 1].scatter(indices, predictionDataFrame['knn_predictions'], color='gray', label='Predicted KNN', marker="o", alpha=0.3)
 axs[0, 1].set_title('Predicted KNN')
-axs[0, 1].set_ylabel('Ammount sold')
+axs[0, 1].set_ylabel('Amount sold')
 axs[0, 1].set_ylim(y_min, y_max)
 axs[0, 1].grid(True, axis='x', linestyle='--', linewidth=0.5, alpha=0.7)
 axs[0, 1].legend()
 axs[0, 1].axhline(y=0, color='black', linestyle='--', linewidth=1.2)  # Linha tracejada em y = 0
 
 # Previsões MLP
-axs[1, 0].scatter(indices, resultsDF['mlp_predictions'], color='red', label='Predicted MLP', marker="o", alpha=0.3)
+axs[1, 0].scatter(indices, predictionDataFrame['mlp_predictions'], color='red', label='Predicted MLP', marker="o", alpha=0.3)
 axs[1, 0].set_title('Predicted MLP')
-axs[1, 0].set_ylabel('Ammount sold')
+axs[1, 0].set_ylabel('Amount sold')
 axs[1, 0].set_ylim(y_min, y_max)
 axs[1, 0].grid(True, axis='x', linestyle='--', linewidth=0.5, alpha=0.7)
 axs[1, 0].legend()
 axs[1, 0].axhline(y=0, color='black', linestyle='--', linewidth=1.2)  # Linha tracejada em y = 0
 
 # Previsões Linear
-axs[1, 1].scatter(indices, resultsDF['linear_predictions'], color='green', label='Predicted Linear', marker="o", alpha=0.3)
+axs[1, 1].scatter(indices, predictionDataFrame['linear_predictions'], color='green', label='Predicted Linear', marker="o", alpha=0.3)
 axs[1, 1].set_title('Predicted Linear')
-axs[1, 1].set_ylabel('Ammount sold')
+axs[1, 1].set_ylabel('Amount sold')
 axs[1, 1].set_ylim(y_min, y_max)
 axs[1, 1].grid(True, axis='x', linestyle='--', linewidth=0.5, alpha=0.7)
 axs[1, 1].legend()
 axs[1, 1].axhline(y=0, color='black', linestyle='--', linewidth=1.2)  # Linha tracejada em y = 0
 
 # Previsões Poly
-axs[2, 0].scatter(indices, resultsDF['poly_predictions'], color='orange', label='Predicted Poly', marker="o", alpha=0.3)
+axs[2, 0].scatter(indices, predictionDataFrame['poly_predictions'], color='orange', label='Predicted Poly', marker="o", alpha=0.3)
 axs[2, 0].set_title('Predicted Poly')
-axs[2, 0].set_ylabel('Ammount sold')
+axs[2, 0].set_ylabel('Amount sold')
 axs[2, 0].set_ylim(y_min, y_max)
 axs[2, 0].grid(True, axis='x', linestyle='--', linewidth=0.5, alpha=0.7)
 axs[2, 0].legend()
 axs[2, 0].axhline(y=0, color='black', linestyle='--', linewidth=1.2)  # Linha tracejada em y = 0
 
 # Previsões SVR
-axs[2, 1].scatter(indices, resultsDF['svr_predictions'], color='purple', label='Predicted SVR', marker="o", alpha=0.3)
+axs[2, 1].scatter(indices, predictionDataFrame['svr_predictions'], color='purple', label='Predicted SVR', marker="o", alpha=0.3)
 axs[2, 1].set_title('Predicted SVR')
-axs[2, 1].set_ylabel('Ammount sold')
+axs[2, 1].set_ylabel('Amount sold')
 axs[2, 1].set_ylim(y_min, y_max)
 axs[2, 1].grid(True, axis='x', linestyle='--', linewidth=0.5, alpha=0.7)
 axs[2, 1].legend()

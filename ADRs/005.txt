@@ -1,7 +1,7 @@
 Número do ADR: 005
 Título: Agregar dados e exportá-los em csv
 Data: 08/06/2024
-Status: Pendente
+Status: Aceito
 
 Contexto
 Exportar dados da consulta do banco de dados para permitir executar em ambientes mais restritos

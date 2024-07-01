@@ -1,7 +1,7 @@
 Número do ADR: 003
 Título: Criação de Script para inserção dos dados no banco de dados
 Data: 02/06/2024
-Status: Pendente
+Status: Aceito
 
 Contexto
 Escolha de linguagem para criação do script para inserção dos dados no banco de dados.

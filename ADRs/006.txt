@@ -1,7 +1,7 @@
 Número do ADR: 006
 Título: Adição de biblioteca para dar suporte a cross validation
 Data: 10/06/2024
-Status: Pendente
+Status: Aceito
 
 Contexto
 É necessário usar cross validation para medidas estatísticas de avaliação do modelo

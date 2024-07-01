@@ -1,7 +1,7 @@
 Número do ADR: 001
 Título: Extração de dados
 Data: 15/05/2024
-Status: Pendente
+Status: Aceito
 
 Contexto
 Extrair dados de uma base para conseguir aplicar algoritmos de regressão.

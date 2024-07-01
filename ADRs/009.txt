@@ -1,7 +1,7 @@
 Número do ADR: 009
 Título: Exportar os dados de vendas diárias apenas no período da Páscoa
 Data: 19/06/2024
-Status: Pendente
+Status: Recusado - os outliers não estavam relacionados ao período.
 
 Contexto
 Ao realizar alguns testes com vários algoritmos, foi identificado que ocorria overfitting e em outros os outliers eram extremamente consideráveis no treinamento, ocasionando uma loss alta

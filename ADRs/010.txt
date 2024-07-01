@@ -1,7 +1,7 @@
 Número do ADR: 010
 Título: Criar um único script que compare os diferentes modelos de algoritmos de forma justa
 Data: 19/06/2024
-Status: Pendente
+Status: Aceito
 
 Contexto
 Ao realizar comparação de algoritmos, foi identificado que os mesmos devem ser tratados com o mesmo conjunto de dados.

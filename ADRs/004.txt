@@ -1,7 +1,7 @@
 Número do ADR: 004
 Título: Criação de Script realizar regressão dos dados de venda
 Data: 02/06/2024
-Status: Pendente
+Status: Aceito
 
 Contexto
 Escolha de linguagem e biblioteca para regressão

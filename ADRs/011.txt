@@ -1,7 +1,7 @@
 Número do ADR: 011
 Título: Usar pipeline do sklearn para facilitar pre processamentos
 Data: 20/06/2024
-Status: Pendente
+Status: Aceito
 
 Contexto
 Ao se desenvolver tudo em um único script, ficou claro que haveria muita repetição para construcao e avaliação cruzada dos modelos.

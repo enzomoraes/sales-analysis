@@ -1,7 +1,7 @@
 Número do ADR: 002
 Título: Inserção dos dados em um banco de dados relacional
 Data: 02/06/2024
-Status: Pendente
+Status: Aceito
 
 Contexto
 Inserir os dados extraídos em um banco de dados relacional, para possibilitar agregação dos dados usando SQL.
