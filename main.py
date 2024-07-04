@@ -33,30 +33,14 @@ def loadData():
   dataFrame = pd.read_csv('consolidated.csv')
   dataFrame['data'] = pd.to_datetime(dataFrame['data'])
 
-  # adicionando feature days_until_easter
-  easterDays = getEasterDays()
-  easterIndexes = []
-  for easter in easterDays:
-    easterIndex = dataFrame.index[dataFrame['data'] == easter].tolist()
-    if not easterIndex:
-          # Se a data da Páscoa não for encontrada, pegar o próximo dia disponível
-          easter = easter - pd.Timedelta(days=1)
-          easterIndex = dataFrame.index[dataFrame['data'] == easter].tolist()
-      
-    if easterIndex:
-        easterIndex = easterIndex[0]
-    easterIndexes.append(easterIndex)
-
-
   # Separar as variáveis independentes (X) e dependentes (y)
-  # X = dataFrame[['easter_influence', 'selic', 'days_until_easter', 'weekday_0', 'weekday_1', 'weekday_2', 'weekday_3', 'weekday_4', 'weekday_5', 'weekday_6', 'week_of_month_1', 'week_of_month_2', 'week_of_month_3', 'week_of_month_4', 'week_of_month_5']].values
   X = dataFrame[['selic', 'days_since_selic_update', 'days_until_easter', 'is_weekend', 'previous_day_sales_1', 'previous_day_sales_2', 'previous_day_sales_3', 'previous_day_sales_4', 'previous_day_sales_5']].values
   y = dataFrame['quantidade'].values.reshape(-1,  1)
-  return (X, y, dataFrame, easterIndexes)
+  return (X, y, dataFrame)
 
 #endregion
 
-X, y, dataFrame, easterIndexes = loadData()
+X, y, dataFrame = loadData()
 
 #region Cross validation
 innerKfold = model_selection.KFold(n_splits=10, shuffle=True)
@@ -371,8 +355,8 @@ axs[2, 1].axhline(y=0, color='black', linestyle='--', linewidth=1.2)  # Linha tr
 # Adicionando ticks e labels
 ticks = []
 ticksLabels = []
-for index, date, dataIndex in zip(indices, dataFrame['data'].tail(len(indices)), dataFrame['indice'].tail(len(indices))):
-    if dataIndex in easterIndexes:
+for index, date in zip(indices, dataFrame['data'].tail(len(indices))):
+    if date in getEasterDays():
         ticks.append(index)
         ticksLabels.append(f"{date.day}/{date.month}/{date.year}")
 
