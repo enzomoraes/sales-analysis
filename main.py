@@ -9,7 +9,7 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVR
 from easterDays import getEasterDays 
-
+import joblib
 
 #region utils
 def remove_prefix(params):
@@ -249,6 +249,11 @@ linear_predictions = linearGridSearch.predict(X_test)
 mlp_predictions = mlpGridSearch.predict(X_test)
 poly_predictions = polyGridSearch.predict(X_test)
 svr_predictions = svrGridSearch.predict(X_test)
+
+joblib.dump(knnGridSearch, './models/knn.pkl')
+joblib.dump(linearGridSearch, './models/linear.pkl')
+joblib.dump(mlpGridSearch, './models/mlp.pkl')
+joblib.dump(polyGridSearch, './models/polynomial.pkl')
 
 # Create a DataFrame to store the predictions and metrics
 predictionDataFrame = pd.DataFrame({
